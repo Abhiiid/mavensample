@@ -1,42 +1,58 @@
+@Library('mylibrary')_
 pipeline
 {
     agent any
     stages
     {
-        stage('ContDownload')
+        stage('Download_Master')
         {
             steps
             {
-                git 'https://github.com/IntelliqDevops/maven.git' 
+                script
+                {
+                    cicd.gitDownload("maven")
+                }
             }
         }
-        stage('ContBuild')
+        stage('Build_Master')
         {
             steps
             {
-                sh 'mvn package'
+                script
+                {
+                    cicd.buildArtifact()
+                }
             }
         }
-        stage('ContDeployment')
+        stage('Deployment_Master')
         {
             steps
             {
-                deploy adapters: [tomcat9(credentialsId: '015febd0-2e3d-4ceb-a0f6-d0728dcbe184', path: '', url: 'http://172.31.17.57:8080')], contextPath: 'testapp', war: '**/*.war'
+                script
+                {
+                    cicd.tomcatDeploy("multibranchpipeline","172.31.17.57","testapp")
+                }
             }
         }
-        stage('ContTesting')
+        stage('Testing_Master')
         {
             steps
             {
-                git 'https://github.com/IntelliqDevops/FunctionalTesting.git'
-                sh 'java -jar /var/lib/jenkins/workspace/Descriptivepipeline1/testing.jar'
+                script
+                {
+                    cicd.gitDownload("FunctionalTesting")
+                    cicd.executeSelenium("multibranchpipeline")
+                }
             }
         }
-        stage('ContDelivery')
+        stage('Delivery_Master')
         {
             steps
             {
-                deploy adapters: [tomcat9(credentialsId: '015febd0-2e3d-4ceb-a0f6-d0728dcbe184', path: '', url: 'http://172.31.21.114:8080')], contextPath: 'prodapp', war: '**/*.war'
+                script
+                {
+                    cicd.tomcatDeploy("multibranchpipeline","172.31.21.114","prodapp")
+                }
             }
         }
     }
