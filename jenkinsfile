@@ -24,36 +24,5 @@ pipeline
                 }
             }
         }
-        stage('Deployment_Master')
-        {
-            steps
-            {
-                script
-                {
-                    cicd.tomcatDeploy("multibranchpipeline","172.31.17.57","testapp")
-                }
-            }
-        }
-        stage('Testing_Master')
-        {
-            steps
-            {
-                script
-                {
-                    cicd.gitDownload("FunctionalTesting")
-                    cicd.executeSelenium("multibranchpipeline")
-                }
-            }
-        }
-        stage('Delivery_Master')
-        {
-            steps
-            {
-                script
-                {
-                    cicd.tomcatDeploy("multibranchpipeline","172.31.21.114","prodapp")
-                }
-            }
-        }
     }
 }
